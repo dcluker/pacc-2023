@@ -1,6 +1,6 @@
 import httpx
 from prefect import flow, task, get_run_logger
-from prefect.tasks import task_input_hash
+
 
 @flow(retries=4, retry_delay_seconds=1)
 def try_again():
@@ -20,7 +20,7 @@ def fetch_cat_fact():
         raise Exception()
     log.info(cat_fact.text)
 
-@flow(retries=4, retry_delay_seconds=0.1, cache_key_fn=task_input_hash)
+@flow(retries=4, retry_delay_seconds=0.1)
 def fetch_weather(lat: float, lon: float):
   base_url = "https://api.open-meteo.com/v1/forecast/"
   weather = httpx.get(
@@ -32,7 +32,7 @@ def fetch_weather(lat: float, lon: float):
 
 
 @flow
-def fetch():
+def grab():
     log = get_run_logger()
     #fetch_cat_fact()
     weather = fetch_weather(39.7589,84.1916)
@@ -40,4 +40,4 @@ def fetch():
     try_again()
 
 if __name__ == "__main__":
-    fetch()
+    grab()
